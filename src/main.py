@@ -1,4 +1,5 @@
 import datetime
+import os
 
 
 def get_deposit():
@@ -19,10 +20,10 @@ def get_operation():
     return user_answer
 
 
-def see_total_amount(file_name):
+def see_total_amount(file_path):
     up_money = []
     down_money = []
-    with open(file_name, "r") as file:
+    with open(file_path, "r") as file:
         lines = file.readlines()
         for line in lines:
             if line[0] == "+":
@@ -39,29 +40,28 @@ def readable_date():
     return formatted_date
 
 
-def has_money(file_name):
-    total_amount = see_total_amount(file_name)
+def has_money(file_path):
+    total_amount = see_total_amount(file_path)
     if total_amount > 0:
         return True
     else:
         return False
 
 
-def write_deposit(file_name, date, deposit_amount):
-    with open(file_name, "a") as file:
+def write_deposit(file_path, date, deposit_amount):
+    with open(file_path, "a") as file:
         file.write(f"+ {date} ---> {deposit_amount}\n")
 
 
-def write_withdraw(file_name, date, withdraw_amount):
-    with open(file_name, "a") as file:
+def write_withdraw(file_path, date, withdraw_amount):
+    with open(file_path, "a") as file:
         file.write(f"- {date} ---> {withdraw_amount}\n")
 
 
 def main():
     date = readable_date()
     operation = get_operation()
-    file_name = "money_record.txt"
-    file_path = "./money_record.txt"
+    file_path = "/home/tiger/Deposito_Local/python_projects/money_record/src/money_record.txt"
     total_amount = see_total_amount(file_path)
     if operation == "1":
         try:
@@ -69,8 +69,12 @@ def main():
         except ValueError:
             print("\nInvalid amount.")
         else:
-            write_deposit(file_name, date, user_deposit)
-            print("\nDeposit completed succesfully!")
+            if user_deposit > 0:
+                write_deposit(file_path, date, user_deposit)
+                print("\nDeposit completed succesfully!")
+            else:
+                print("\nInvalid amount.")
+                return
     elif operation == "2":
         if has_money(file_path):
             try:
@@ -79,12 +83,12 @@ def main():
                 print("\nInvalid amount.")
                 return
             else:
-                if user_withdraw > total_amount:
+                if (user_withdraw > total_amount) or (user_withdraw <= 0):
                     print(
-                        "\nThere's not enough money in your account to complete the process.")
+                        "\nThere's not enough money in your account to complete the process \nor you're entering a negative number/zero.")
                     return
                 else:
-                    write_withdraw(file_name, date, user_withdraw)
+                    write_withdraw(file_path, date, user_withdraw)
                     print("\nWithdraw completed succesfully!")
         else:
             print("\nYou don't have money in your account.")
